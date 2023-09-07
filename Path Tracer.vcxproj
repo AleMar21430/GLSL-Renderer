@@ -145,27 +145,27 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\FBT.h" />
+    <ClInclude Include="include\FBO.h" />
     <ClInclude Include="include\Include.hpp" />
-    <ClInclude Include="source\EBO.h" />
-    <ClInclude Include="source\shaderClass.h" />
-    <ClInclude Include="source\VAO.h" />
-    <ClInclude Include="source\VBO.h" />
+    <ClInclude Include="include\EBO.h" />
+    <ClInclude Include="include\Shader.h" />
+    <ClInclude Include="include\VAO.h" />
+    <ClInclude Include="include\VBO.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\FBT.cpp" />
+    <ClCompile Include="source\FBO.cpp" />
     <ClCompile Include="source\EBO.cpp" />
     <ClCompile Include="source\glad.c" />
     <ClCompile Include="source\main.cpp" />
-    <ClCompile Include="source\shaderClass.cpp" />
+    <ClCompile Include="source\Shader.cpp" />
     <ClCompile Include="source\VAO.cpp" />
     <ClCompile Include="source\VBO.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\Frag.glsl" />
     <None Include="resources\Vert.glsl" />
-    <None Include="source\frag.glsl" />
-    <None Include="source\vert.glsl" />
-    <None Include="source\Shader.frag" />
-    <None Include="source\Shader.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
