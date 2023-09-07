@@ -165,6 +165,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\Frag.glsl" />
+    <None Include="resources\Post.glsl" />
     <None Include="resources\Vert.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

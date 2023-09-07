@@ -235,13 +235,12 @@ void main()
 
 	col *= 40.;
 
-	/*if (iFrame < 1) {
-		fragColor = vec4(col, 1.);
+	if (iFrame < 1) {
+		fragColor = vec4(col, 1.0);
 	}
-	else {*/
-
-	vec2 pacc = vec2(fragTexCoord);
-	fragColor = (texture(iLastFrame, pacc) * float(iFrame) + vec4(0.1, 0.1, 0.1, 1.0) + vec4(col, 1.) * 15.0) / float(iFrame + 1);
-	//fragColor = vec4(col, 1.);
+	else {
+		vec2 pacc = vec2(fragTexCoord);
+		fragColor = (texture(iLastFrame, pacc) * float(iFrame) + vec4(0.1, 0.1, 0.1, 1.0) + vec4(col, 1.0) * 15.0) / float(iFrame + 1);
+	}
 	//}
 }

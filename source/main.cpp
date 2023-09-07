@@ -19,11 +19,17 @@ GLuint indices[] = {
 };
 uint16_t Width = 860;
 uint16_t Height = 540;
+size_t current_frame = 0;
+FBT buffer_tex_a;
+FBT last_frame_tex;
 
-void framebuffer_size_callback(GLFWwindow* window, int new_width, int new_height) {
-	glViewport(0, 0, new_width, new_height);
-	Width = new_width;
-	Height = new_height;
+void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+	glViewport(0, 0, width, height);
+	Width = width;
+	Height = height;
+	current_frame = 0;
+	buffer_tex_a.Resize(width, height);
+	last_frame_tex.Resize(width, height);
 }
 
 int main() {
@@ -50,6 +56,7 @@ int main() {
 
 	// Generates Shader object using shaders defualt.vert and default.frag
 	Shader Buffer_A("./resources/Vert.glsl", "./resources/Frag.glsl");
+	Shader Main_Image("./resources/Vert.glsl", "./resources/Post.glsl");
 
 	// VERTICES //
 	VAO VAO_main;
@@ -65,28 +72,40 @@ int main() {
 	// FBOs //
 	FBO FBO_main;
 	FBO_main.Bind();
-	FBT FBT_main(Width, Height);
+	buffer_tex_a.Init(Width, Height);
 	FBO_main.Unbind();
 
-	FBT last_frame(Width, Height);
+	last_frame_tex.Init(Width, Height);
 
-	size_t current_frame = 0;
 
-	glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	while (!glfwWindowShouldClose(window)) {
+		double Time = glfwGetTime();
+		FBO_main.Bind();
 		glClear(GL_COLOR_BUFFER_BIT);
 		Buffer_A.Activate();
 		VAO_main.Bind();
 
-		glUniform1f(glGetUniformLocation(Buffer_A.ID, "iTime"), glfwGetTime());
+		glUniform1f(glGetUniformLocation(Buffer_A.ID, "iTime"), Time);
 		glUniform1i(glGetUniformLocation(Buffer_A.ID, "iFrame"), current_frame);
 		glUniform2f(glGetUniformLocation(Buffer_A.ID, "iResolution"), Width, Height);
-		last_frame.Bind();
+		last_frame_tex.Bind();
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, Width, Height);
-		last_frame.Unbind();
+		last_frame_tex.Unbind();
+
+		FBO_main.Unbind();
+
+		Main_Image.Activate();
+
+		glUniform1f(glGetUniformLocation(Main_Image.ID, "iTime"), Time);
+		glUniform1i(glGetUniformLocation(Main_Image.ID, "iFrame"), current_frame);
+		glUniform2f(glGetUniformLocation(Main_Image.ID, "iResolution"), Width, Height);
+		buffer_tex_a.Bind(GL_TEXTURE0);
+
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		// Swap the back buffer with the front buffer
 		glfwSwapBuffers(window);

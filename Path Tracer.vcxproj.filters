@@ -70,5 +70,6 @@
     <None Include="resources\Frag.glsl">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="resources\Post.glsl" />
   </ItemGroup>
 </Project>

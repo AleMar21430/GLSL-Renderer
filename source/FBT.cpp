@@ -1,6 +1,6 @@
 #include "../include/FBT.h"
 
-FBT::FBT(const int& i_width, const int& i_height) {
+void FBT::Init(const int& i_width, const int& i_height) {
 	glGenTextures(1, &ID);
 	glBindTexture(GL_TEXTURE_2D, ID);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, i_width, i_height, 0, GL_RGBA, GL_FLOAT, NULL);
