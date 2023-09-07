@@ -7,6 +7,9 @@
 #include"../include/FBT.h"
 #include"../include/Shader.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "../include/stb_image.h"
+
 GLfloat vertices[] = {
 	-1.0f, -1.0f, 0.0f, 0.0f,
 	 1.0f, -1.0f, 1.0f, 0.0f,
@@ -53,6 +56,11 @@ int main() {
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	GLFWwindow* window = glfwCreateWindow(Width, Height, "GLSL Shader", NULL, NULL);
+
+	GLFWimage icons[1];
+	icons[0].pixels = stbi_load("./resources/Icon.png", &icons[0].width, &icons[0].height, 0, 4);
+	glfwSetWindowIcon(window, 1, icons);
+	stbi_image_free(icons[0].pixels);
 
 	if (window == NULL) {
 		std::cout << "Failed to create GLFW window" << std::endl;

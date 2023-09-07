@@ -24,6 +24,7 @@
     <ProjectGuid>{d09b4857-438f-41e0-a588-829587bfdd0a}</ProjectGuid>
     <RootNamespace>PathTracer</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>GLSL Renderer</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -150,6 +151,7 @@
     <ClInclude Include="include\Include.hpp" />
     <ClInclude Include="include\EBO.h" />
     <ClInclude Include="include\Shader.h" />
+    <ClInclude Include="include\stb_image.h" />
     <ClInclude Include="include\VAO.h" />
     <ClInclude Include="include\VBO.h" />
   </ItemGroup>
@@ -167,6 +169,9 @@
     <None Include="resources\Frag_A.glsl" />
     <None Include="resources\Post.glsl" />
     <None Include="resources\Vert.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\Icon.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
