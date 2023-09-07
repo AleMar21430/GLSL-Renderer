@@ -23,6 +23,8 @@ size_t current_frame = 0;
 FBT buffer_tex_a;
 FBT last_frame_tex;
 FBO FBO_main;
+Shader_Program Buffer_A("Buffer A");
+Shader_Program Main_Image("Main Image");
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);
@@ -35,6 +37,14 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	last_frame_tex.Resize(width, height);
 }
 
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+	if (key == GLFW_KEY_R && action == GLFW_PRESS) {
+		Buffer_A.ReCompile();
+		Main_Image.ReCompile();
+		current_frame = 0;
+	}
+}
+
 int main() {
 	glfwInit();
 
@@ -42,7 +52,7 @@ int main() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	GLFWwindow* window = glfwCreateWindow(Width, Height, "Path Tracer", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(Width, Height, "GLSL Shader", NULL, NULL);
 
 	if (window == NULL) {
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -54,12 +64,13 @@ int main() {
 	gladLoadGL();
 
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	glfwSetKeyCallback(window, key_callback);
 
 	glViewport(0, 0, Width, Height);
 
 	// Generates Shader object using shaders defualt.vert and default.frag
-	Shader Buffer_A("./resources/Vert.glsl", "./resources/Frag.glsl");
-	Shader Main_Image("./resources/Vert.glsl", "./resources/Post.glsl");
+	Buffer_A.Init("./resources/Frag_A.glsl");
+	Main_Image.Init("./resources/Post.glsl");
 
 	// VERTICES //
 	VAO VAO_main;

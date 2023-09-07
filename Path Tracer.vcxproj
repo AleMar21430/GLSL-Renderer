@@ -164,7 +164,7 @@
     <ClCompile Include="source\VBO.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="resources\Frag.glsl" />
+    <None Include="resources\Frag_A.glsl" />
     <None Include="resources\Post.glsl" />
     <None Include="resources\Vert.glsl" />
   </ItemGroup>

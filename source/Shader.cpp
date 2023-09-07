@@ -14,9 +14,11 @@ string get_file_contents(const char* filename) {
 	throw(errno);
 }
 
-Shader::Shader(const char* vertexFile, const char* fragmentFile) {
+void Shader_Program::Init(const char* fragmentFile) {
+	Frag_Source = fragmentFile;
+
 	// Read vertexFile and fragmentFile and store the strings
-	string vertexCode = get_file_contents(vertexFile);
+	string vertexCode = get_file_contents("./resources/Vert.glsl");
 	string fragmentCode = get_file_contents(fragmentFile);
 
 	// Convert the shader source strings into character arrays
@@ -30,7 +32,7 @@ Shader::Shader(const char* vertexFile, const char* fragmentFile) {
 	// Compile the Vertex Shader into machine code
 	glCompileShader(vertexShader);
 	// Checks if Shader compiled succesfully
-	compileErrors(vertexShader, "VERTEX");
+	compileErrors(vertexShader, ("VERTEX " + Program_Name).c_str());
 
 	// Create Fragment Shader Object and get its reference
 	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -39,7 +41,7 @@ Shader::Shader(const char* vertexFile, const char* fragmentFile) {
 	// Compile the Vertex Shader into machine code
 	glCompileShader(fragmentShader);
 	// Checks if Shader compiled succesfully
-	compileErrors(fragmentShader, "FRAGMENT");
+	compileErrors(fragmentShader, ("FRAGMENT " + Program_Name).c_str());
 
 	// Create Shader Program Object and get its reference
 	ID = glCreateProgram();
@@ -49,23 +51,51 @@ Shader::Shader(const char* vertexFile, const char* fragmentFile) {
 	// Wrap-up/Link all the shaders together into the Shader Program
 	glLinkProgram(ID);
 	// Checks if Shaders linked succesfully
-	compileErrors(ID, "PROGRAM");
+	compileErrors(ID, ("PROGRAM " + Program_Name).c_str());
 
 	// Delete the now useless Vertex and Fragment Shader objects
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
-
 }
 
-void Shader::Activate() {
+void Shader_Program::ReCompile() {
+	glDeleteProgram(ID);
+
+	string vertexCode = get_file_contents("./resources/Vert.glsl");
+	string fragmentCode = get_file_contents(Frag_Source.c_str());
+
+	const char* vertexSource = vertexCode.c_str();
+	const char* fragmentSource = fragmentCode.c_str();
+
+	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vertexShader, 1, &vertexSource, NULL);
+	glCompileShader(vertexShader);
+	compileErrors(vertexShader, ("VERTEX " + Program_Name).c_str());
+
+	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
+	glCompileShader(fragmentShader);
+	compileErrors(fragmentShader, ("FRAGMENT " + Program_Name).c_str());
+
+	ID = glCreateProgram();
+	glAttachShader(ID, vertexShader);
+	glAttachShader(ID, fragmentShader);
+	glLinkProgram(ID);
+	compileErrors(ID, ("PROGRAM " + Program_Name).c_str());
+
+	glDeleteShader(vertexShader);
+	glDeleteShader(fragmentShader);
+}
+
+void Shader_Program::Activate() {
 	glUseProgram(ID);
 }
 
-void Shader::Delete() {
+void Shader_Program::Delete() {
 	glDeleteProgram(ID);
 }
 
-void Shader::compileErrors(unsigned int shader, const char* type) {
+void Shader_Program::compileErrors(unsigned int shader, const char* type) {
 	GLint hasCompiled;
 	char infoLog[1024];
 	if (type != "PROGRAM") {
