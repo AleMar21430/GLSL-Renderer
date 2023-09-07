@@ -5,7 +5,9 @@
 struct FBO {
 	GLuint ID;
 
-	FBO();
+	FBO() {};
+
+	void Init();
 
 	void Bind();
 	void Unbind();

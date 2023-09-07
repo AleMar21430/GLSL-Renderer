@@ -12,5 +12,5 @@ in vec2 fragTexCoord;
 out vec4 fragColor;
 
 void main() {
-	fragColor = texture(iRawFrame, fragTexCoord) * vec4(1.0, 0.25, 0.25, 1.0);
+	fragColor = vec4(tanh(6.0 * texture(iRawFrame, fragTexCoord).xyz), 1);
 }

@@ -22,13 +22,16 @@ uint16_t Height = 540;
 size_t current_frame = 0;
 FBT buffer_tex_a;
 FBT last_frame_tex;
+FBO FBO_main;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);
 	Width = width;
 	Height = height;
 	current_frame = 0;
+	FBO_main.Bind();
 	buffer_tex_a.Resize(width, height);
+	FBO_main.Unbind();
 	last_frame_tex.Resize(width, height);
 }
 
@@ -70,7 +73,7 @@ int main() {
 	Faces.Unbind();
 
 	// FBOs //
-	FBO FBO_main;
+	FBO_main.Init();
 	FBO_main.Bind();
 	buffer_tex_a.Init(Width, Height);
 	FBO_main.Unbind();

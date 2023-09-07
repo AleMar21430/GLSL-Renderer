@@ -11,236 +11,189 @@ in vec2 fragTexCoord;
 
 out vec4 fragColor;
 
+#define time (iTime*0.1 + 5.0)
 
-
-#define PI 3.1415926535
-
-
-struct Circle
-{
-	vec2 ctr;
-	float rad;
-};
-
-struct Ray
-{
-	vec2 org;
-	vec2 dir;
-};
-
-struct Segment
-{
-	vec2 A;
-	vec2 B;
-};
-
-struct Bezier3
-{
-	vec2 A;
-	vec2 B;
-	vec2 C;
-};
-
-struct Bezier4
-{
-	vec2 A;
-	vec2 B;
-	vec2 C;
-	vec2 D;
-};
-
-struct Grid
-{
-	float inter;
-};
-
-bool intersect(Circle c, Ray r, out vec2 t)
-{
-	float A = dot(r.dir, r.dir);
-	float B = dot(r.dir, -c.ctr + r.org);
-	float C = dot(c.ctr, c.ctr) + dot(r.org, r.org) - 2. * dot(c.ctr, r.org) - c.rad * c.rad;
-
-	float delta = B * B - A * C;
-
-	if (delta < 0.0)
-		return false;
-
-	t = (vec2(-B) + vec2(sqrt(delta)) * vec2(-1., 1.)) / A;
-	return true;
+mat2 rot(float a) {
+	float ca = cos(a);
+	float sa = sin(a);
+	return mat2(ca, sa, -sa, ca);
 }
 
-vec2 getPt(Ray r, float t)
-{
-	return r.org + t * r.dir;
+// Box SDF
+float box(vec3 p, vec3 s) {
+	p = abs(p) - s;
+	return max(p.x, max(p.y, p.z));
 }
 
-vec2 getPt(Circle c, float t)
-{
-	return c.ctr + c.rad * vec2(cos(t * PI * 2.), sin(t * PI * 2.));
+// capsule SDF
+float caps(vec3 p, vec3 p1, vec3 p2, float s) {
+	vec3 pa = p - p1;
+	vec3 pb = p2 - p1;
+	float prog = dot(pa, pb) / dot(pb, pb);
+	prog = clamp(prog, 0., 1.);
+	return length(p1 + pb * prog - p) - s;
 }
 
-vec2 getPt(Segment c, float t)
-{
-	return mix(c.A, c.B, t);
-}
+// to switch between the 2 scenes
+int scene = 0;
 
-vec2 getPt(Bezier3 c, float t)
-{
-	return mix(mix(c.A, c.B, t), mix(c.B, c.C, t), t);
-}
+// first SDF function with the refractive geometry
+float map(vec3 p) {
 
-vec2 getPt(Bezier4 c, float t)
-{
-	return mix(mix(mix(c.A, c.B, t), mix(c.B, c.C, t), t), mix(mix(c.B, c.C, t), mix(c.C, c.D, t), t), t);
-}
+	// sphere in cube
+	vec3 p2 = p;
+	float t = time * 0.1;
+	p2.yz *= rot(t);
+	p2.yx *= rot(t * 1.3);
+	float d4 = max(box(p2, vec3(3)), 1.2 - length(p));
 
-float dist(Ray r, vec2 p)
-{
-	return abs(dot(r.dir.yx * vec2(-1., 1.), p - r.org) / dot(r.dir, r.dir));
-}
-
-float dist(vec2 p0, vec2 p1)
-{
-	return length(p1 - p0);
-}
-
-float dist(Circle c, vec2 p)
-{
-	return abs(length(c.ctr - p) - c.rad);
-}
-
-float dist(Segment s, vec2 p)
-{
-	vec2 pa = p - s.A, ba = s.B - s.A;
-	float h = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
-	return length(pa - ba * h);
-
-}
-
-float dist(Grid g, vec2 p)
-{
-	vec2 d = mod(p, g.inter);
-	d = min(d, g.inter - d);
-	return min(d.x, d.y);
-}
-
-
-// Solve cubic equation for roots
-vec3 solveCubic(float a, float b, float c)
-{
-	float p = b - a * a / 3.0, p3 = p * p * p;
-	float q = a * (2.0 * a * a - 9.0 * b) / 27.0 + c;
-	float d = q * q + 4.0 * p3 / 27.0;
-	float offset = -a / 3.0;
-	if (d >= 0.0) {
-		float z = sqrt(d);
-		vec2 x = (vec2(z, -z) - q) / 2.0;
-		vec2 uv = sign(x) * pow(abs(x), vec2(1.0 / 3.0));
-		return vec3(offset + uv.x + uv.y);
-	}
-	float v = acos(-sqrt(-27.0 / p3) * q / 2.0) / 3.0;
-	float m = cos(v), n = sin(v) * 1.732050808;
-	return vec3(m + m, -n - m, n - m) * sqrt(-p / 3.0) + offset;
-}
-
-// Find the signed distance from a point to a bezier curve
-float dist(Bezier3 B, vec2 p)
-{
-	vec2 a = B.B - B.A, b = B.A - B.B * 2.0 + B.C, c = a * 2.0, d = B.A - p;
-	vec3 k = vec3(3. * dot(a, b), 2. * dot(a, a) + dot(d, b), dot(d, a)) / dot(b, b);
-	vec3 t = clamp(solveCubic(k.x, k.y, k.z), 0.0, 1.0);
-	vec2 pos = B.A + (c + b * t.x) * t.x;
-	float dis = length(pos - p);
-	pos = B.A + (c + b * t.y) * t.y;
-	dis = min(dis, length(pos - p));
-	pos = B.A + (c + b * t.z) * t.z;
-	dis = min(dis, length(pos - p));
-	return dis;
-}
-
-float dist(Bezier4 BB, vec2 p)
-{
-	vec2 A = BB.A, B = BB.D;
-
-	float ppt;
-	float At = .0;
-	float Bt = 1.;
-
-	vec2 pp;
-
-	float dis = dist(pp, p);
-
-	for (int i = 0; i < 5; ++i)
-	{
-		ppt = (At + Bt) * .5;
-		pp = getPt(BB, ppt);
-
-		if (dist(Segment(A, pp), p) < dist(Segment(pp, B), p))
-		{
-			Bt = ppt;
-			B = getPt(BB, Bt);
-		}
-		else
-		{
-			At = ppt;
-			A = getPt(BB, At);
-		}
-
+	// KIFS with spheres and cubes
+	vec3 pb = p;
+	float d2 = 10000.;
+	for (float i = 0.; i < 3.; ++i) {
+		float t = time * 0.03 + i;
+		p.yz *= rot(t + i);
+		p.yx *= rot(t * 1.3);
+		d2 = min(d2, length(p) - 0.47);
+		p = abs(p);
+		p -= 0.9;
 	}
 
-	return min(dist(Segment(A, pp), p), dist(Segment(B, pp), p));
+
+	float d = box(p, vec3(0.4, 0.4, 0.4));
+
+	d = min(d, d2);
+	//d=d2;
+
+	if (scene == 0) d = d4;
+	//d=d4;
+
+	return d;
 }
 
+// we will have a maximum of 10 bounces of the laser
+#define pcount 10
+vec3 points[pcount];
+int pid = 1;
 
-#define DRAW(O,P,C,W, CC)	CC=mix(CC,C,mix(1.,0.,clamp(dist(O,P)*iResolution.y/2. -  W, -1., 1.)*.5+.5))
+float atm = 0.;
+// second SDF function with both refractive geometry and the laser geometry
+float map2(vec3 p) {
+
+	// get refractive geometry
+	float d = map(p);
+
+	// loop over laser's collisions, insert it into the SDF and accumulate laser's light
+	float d2 = 10000.;
+	for (int i = 0; i < pid - 1; ++i) {
+
+		// one capsule per laser part
+		float d3 = caps(p, points[i], points[i + 1], 0.01);
+
+		// I use the smoothstep to have more contrast between lit and unlit part of the geometry
+		atm += 0.013 / (0.05 + abs(d3)) * smoothstep(4., 0.3, d3);
+
+		d2 = min(d2, d3);
+	}
 
 
+	return min(abs(d), d2);
+}
 
-
-#define lineWidth 	(0.)
-
-vec3 hsv2rgb_smooth(in vec3 c)
-{
-	vec3 rgb = clamp(abs(mod(c.x * 6.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0);
-
-	rgb = rgb * rgb * (3.0 - 2.0 * rgb); // cubic smoothing	
-
-	return c.z * mix(vec3(1.0), rgb, c.y);
+float rnd(vec2 uv) {
+	return fract(dot(sin(uv * 452.714 + uv.yx * 547.524), vec2(352.887)));
 }
 
 void main()
 {
+	vec2 uv = vec2(fragCoord.x - 0.5, fragCoord.y - 0.5) * 4;
+	//uv -= 0.5;
+	uv /= vec2(iResolution.y / iResolution.x, 1);
 
-	int N = int(iResolution.y);
-	float dy = 1. / (float(N) - 1.);
-	//float k = float(iFrame) * dy;
-	float k = float(iFrame) / 1000.;
-	k += float(iFrame / 1000) / 3000.;
+	// change scene every 10s
+	scene = int(mod(floor(time / 10.), 2.));
 
-	vec2 p = vec2(fragCoord.x - 0.5, fragCoord.y - 0.5) * 2.5;
-	vec3 col = vec3(0.);
+	// first raymarching to get the laser collisions
+	vec3 s2 = vec3(10, 0, 0);
+	vec3 r2 = normalize(vec3(-1, sin(float(time)) * 0.1, 0));
 
-	vec2 p0 = vec2(1., .0);
-	vec2 p1 = vec2(.5, sin(k * PI * 2. * 5.));
-	vec2 p2 = vec2(-.5, sin(k * PI * 2. * 3.) * .2);
-	//vec2 p3 = vec2(-1. ,.0);
-	vec2 p3 = vec2(-1., cos(k * PI * 2. * 7.) * .7);
+	// get a random refractive index different per pixel
+	float ior = (rnd(uv + fract(iTime * .1)) - 0.5);
+	//ior = (fract(gl_FragCoord.y/3.)-.5);
+	float id = ior * 2.;
+	// compute index of refraction associated color 
+	vec3 diff = 1.3 - vec3(1. + id, 0.45 + abs(id), 1. - id);
 
-	Bezier4 b = Bezier4(p0, p1, p2, p3);
+	vec3 p2 = s2;
+	points[0] = p2;
+	pid = 1;
+	float side = 1.;
+	for (int i = 0; i < 60; ++i) {
+		// we use only refractive geometry SDF
+		float d = abs(map(p2));
+		if (d < 0.001) {
+			// when laser collide with something, store the collision point into the list
+			points[pid] = p2;
+			pid += 1;
+			if (pid >= pcount - 1) break;
 
-
-	vec3 cc = hsv2rgb_smooth(vec3(k, 1., 1.));
-	//vec3 cc = vec3(1.);
-	DRAW(b, p, cc, lineWidth, col);
-
-	col *= 40.;
-
-	if (iFrame < 1) {
-		fragColor = vec4(col, 1.0);
+			// and we compute the refracted direction
+			vec2 off = vec2(0.01, 0);
+			vec3 n2 = side * normalize(d - vec3(map(p2 - off.xyy), map(p2 - off.yxy), map(p2 - off.yyx)));
+			//r2=reflect(r2,n2);
+			vec3 r3 = refract(r2, n2, 1. - side * (0.3 + 0.1 * ior));
+			if (dot(r3, r3) < 0.5) r3 = reflect(r2, n2);
+			r2 = r3;
+			side = -side;
+			d = 0.1;
+		}
+		if (d > 100.0) break;
+		p2 += r2 * d;
 	}
-	else {
-		vec2 pacc = vec2(fragTexCoord);
-		fragColor = (texture(iLastFrame, pacc) * float(iFrame) + vec4(0.1, 0.1, 0.1, 1.0) + vec4(col, 1.0) * 15.0) / float(iFrame + 1);
+	points[pid] = p2 + r2 * 1000.;
+	++pid;
+
+	// second raymarching, what we will see on screen
+	vec3 s = vec3(0, 0, -10);
+	vec3 r = normalize(vec3(uv, 1));
+
+	// dithering noise to eliminate some banding
+	float mumu = mix(rnd(-uv + fract(float(iFrame) * .1)), 1., 0.9);
+	vec3 p = s;
+	float side2 = 1.;
+	for (int i = 0; i < 90; ++i) {
+		float d = abs(map2(p));
+		if (d < 0.001) {
+			// collision, compute refracted direction
+			// we use same per-pixel color and index of refraction than laser's raymarch
+			// it's not 100% correct but hey, it looks good
+			vec2 off = vec2(0.01, 0);
+			vec3 n = side2 * normalize(d - vec3(map(p - off.xyy), map(p - off.yxy), map(p - off.yyx)));
+			vec3 r3 = refract(r, n, 1. - side2 * (0.3 + 0.1 * ior));
+			if (dot(r3, r3) < 0.5) r3 = reflect(r, n);
+			r = r3;
+
+			side2 = -side2;
+			d = 0.1;
+			//break;
+		}
+		if (d > 100.0) break;
+		p += r * d * mumu;
 	}
-	//}
+
+	vec3 col = vec3(0);
+	col += diff * atm;
+
+	/*
+	// original shader was doing gamma here but in shadertoy we can do it in post-effect and it's better
+	col=smoothstep(0.01,0.9,col);
+	col=pow(col, vec3(0.4545));
+	*/
+
+	// use previous frame to have a feedback effect and try to reduce the noise a bit
+	vec4 prev = texture(iLastFrame, fragTexCoord);
+	prev.w *= 0.98;
+	// you can try putting 0.95 instead for lot less noise but also more blurry image
+	vec4 col1 = vec4(prev.xyz * prev.w, prev.w) + vec4(col, 1.0);
+	fragColor = vec4(col1.xyz / col1.w, col1.w);
 }

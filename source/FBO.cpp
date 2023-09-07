@@ -1,6 +1,6 @@
 #include "../include/FBO.h"
 
-FBO::FBO() {
+void FBO::Init() {
 	glGenFramebuffers(1, &ID);
 }
 
