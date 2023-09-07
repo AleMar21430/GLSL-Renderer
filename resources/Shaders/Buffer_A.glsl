@@ -106,7 +106,7 @@ float rnd(vec2 uv) {
 
 void main()
 {
-	vec2 uv = vec2(fragCoord.x - 0.5, fragCoord.y - 0.5) * 4;
+	vec2 uv = vec2(fragCoord.x - 0.5, fragCoord.y - 0.5);
 	//uv -= 0.5;
 	uv /= vec2(iResolution.y / iResolution.x, 1);
 
