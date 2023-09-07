@@ -1,4 +1,4 @@
-#include"../include/Shader.h"
+#include"../include/Shader.hpp"
 
 string get_file_contents(const char* filename) {
 	ifstream in(filename, ios::binary);

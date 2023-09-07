@@ -1,4 +1,4 @@
-#include "../include/FBT.h"
+#include "../include/FBT.hpp"
 
 void FBT::Init(const int& i_width, const int& i_height) {
 	glGenTextures(1, &ID);

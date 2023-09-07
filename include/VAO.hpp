@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../include/Include.hpp"
-#include"VBO.h"
+#include"VBO.hpp"
 
 struct VAO {
 	GLuint ID;

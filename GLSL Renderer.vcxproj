@@ -146,21 +146,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="include\FBT.h" />
-    <ClInclude Include="include\FBO.h" />
+    <ClInclude Include="include\FBT.hpp" />
+    <ClInclude Include="include\FBO.hpp" />
     <ClInclude Include="include\Include.hpp" />
-    <ClInclude Include="include\EBO.h" />
-    <ClInclude Include="include\Shader.h" />
-    <ClInclude Include="include\stb_image.h" />
-    <ClInclude Include="include\VAO.h" />
-    <ClInclude Include="include\VBO.h" />
+    <ClInclude Include="include\EBO.hpp" />
+    <ClInclude Include="include\Shader.hpp" />
+    <ClInclude Include="include\stb_image.hpp" />
+    <ClInclude Include="include\VAO.hpp" />
+    <ClInclude Include="include\VBO.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\FBT.cpp" />
     <ClCompile Include="source\FBO.cpp" />
     <ClCompile Include="source\EBO.cpp" />
     <ClCompile Include="source\glad.c" />
-    <ClCompile Include="source\main.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="source\Shader.cpp" />
     <ClCompile Include="source\VAO.cpp" />
     <ClCompile Include="source\VBO.cpp" />

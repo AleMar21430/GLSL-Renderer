@@ -1,14 +1,14 @@
-#include "../include/Include.hpp"
+#include "./include/Include.hpp"
 
-#include"../include/VAO.h"
-#include"../include/VBO.h"
-#include"../include/EBO.h"
-#include"../include/FBO.h"
-#include"../include/FBT.h"
-#include"../include/Shader.h"
+#include"./include/VAO.hpp"
+#include"./include/VBO.hpp"
+#include"./include/EBO.hpp"
+#include"./include/FBO.hpp"
+#include"./include/FBT.hpp"
+#include"./include/Shader.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "../include/stb_image.h"
+#include "./include/stb_image.hpp"
 
 GLfloat vertices[] = {
 	-1.0f, -1.0f, 0.0f, 0.0f,
