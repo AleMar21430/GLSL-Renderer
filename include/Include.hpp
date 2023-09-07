@@ -16,6 +16,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <numeric>
+#include <cerrno>
 #include <vector>
 #include <chrono>
 #include <thread>
@@ -27,10 +28,8 @@
 #include <map>
 #include <set>
 
-#define GLFW_INCLUDE_VULKAN
-//#include <vulkan/vulkan.h>
-#include <GLFW/glfw3.h>
-#include "glm/glm.hpp"
+#include<glad/glad.h>
+#include<GLFW/glfw3.h>
 
 using namespace std;
 //using namespace glm;
@@ -39,9 +38,3 @@ using namespace std;
 #define TWO_PI      6.283185307179586
 #define INVERTED_PI 0.318309886183791
 #define DEG_RAD     0.017453292519943
-#define RED         dvec4( 1   ,0  , 0   , 1 )
-#define GREEN       dvec4( 0  , 1  , 0   , 1 )
-#define BLUE        dvec4( 0  , 0  , 1   , 1 )
-#define WHITE       dvec4( 1  , 1  , 1   , 1 )
-#define BLACK       dvec4( 0  , 0  , 0   , 1 )
-#define GRAY        dvec4( 0.5, 0.5, 0.5 , 1 )
