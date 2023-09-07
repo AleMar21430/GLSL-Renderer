@@ -1,14 +1,14 @@
-#include "../include/Include.hpp"
+#include "./include/Include.hpp"
 
-#include"../include/VAO.h"
-#include"../include/VBO.h"
-#include"../include/EBO.h"
-#include"../include/FBO.h"
-#include"../include/FBT.h"
-#include"../include/Shader.h"
+#include"./include/VAO.h"
+#include"./include/VBO.h"
+#include"./include/EBO.h"
+#include"./include/FBO.h"
+#include"./include/FBT.h"
+#include"./include/Shader.h"
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "../include/stb_image.h"
+#include "./include/stb_image.h"
 
 GLfloat vertices[] = {
 	-1.0f, -1.0f, 0.0f, 0.0f,
@@ -23,6 +23,7 @@ GLuint indices[] = {
 uint16_t Width = 860;
 uint16_t Height = 540;
 size_t current_frame = 0;
+double iTime = 0.0;
 FBT buffer_tex_a;
 FBT last_frame_tex;
 FBO FBO_main;
@@ -34,6 +35,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	Width = width;
 	Height = height;
 	current_frame = 0;
+	iTime = glfwGetTime();
 	FBO_main.Bind();
 	buffer_tex_a.Resize(width, height);
 	FBO_main.Unbind();
@@ -45,6 +47,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		Buffer_A.ReCompile();
 		Main_Image.ReCompile();
 		current_frame = 0;
+		iTime = glfwGetTime();
 	}
 }
 
@@ -77,8 +80,8 @@ int main() {
 	glViewport(0, 0, Width, Height);
 
 	// Generates Shader object using shaders defualt.vert and default.frag
-	Buffer_A.Init("./resources/Frag_A.glsl");
-	Main_Image.Init("./resources/Post.glsl");
+	Buffer_A.Init("./resources/Shaders/Buffer_A.glsl");
+	Main_Image.Init("./resources/Shaders/Main_Image.glsl");
 
 	// VERTICES //
 	VAO VAO_main;
@@ -99,10 +102,9 @@ int main() {
 
 	last_frame_tex.Init(Width, Height);
 
-
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	while (!glfwWindowShouldClose(window)) {
-		double Time = glfwGetTime();
+		double Time = glfwGetTime() - iTime;
 		FBO_main.Bind();
 		glClear(GL_COLOR_BUFFER_BIT);
 		Buffer_A.Activate();

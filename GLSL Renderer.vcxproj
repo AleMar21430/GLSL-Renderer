@@ -156,18 +156,18 @@
     <ClInclude Include="include\VBO.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="resources\glad.c" />
     <ClCompile Include="source\FBT.cpp" />
     <ClCompile Include="source\FBO.cpp" />
     <ClCompile Include="source\EBO.cpp" />
-    <ClCompile Include="source\glad.c" />
-    <ClCompile Include="source\main.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="source\Shader.cpp" />
     <ClCompile Include="source\VAO.cpp" />
     <ClCompile Include="source\VBO.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="resources\Frag_A.glsl" />
-    <None Include="resources\Post.glsl" />
+    <None Include="resources\Shaders\Buffer_A.glsl" />
+    <None Include="resources\Shaders\Main_Image.glsl" />
     <None Include="resources\Vert.glsl" />
   </ItemGroup>
   <ItemGroup>
