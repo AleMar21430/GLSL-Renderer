@@ -110,8 +110,8 @@ int main() {
 		Buffer_A.Activate();
 		VAO_main.Bind();
 
-		glUniform1f(glGetUniformLocation(Buffer_A.ID, "iTime"), Time);
-		glUniform1i(glGetUniformLocation(Buffer_A.ID, "iFrame"), current_frame);
+		glUniform1f(glGetUniformLocation(Buffer_A.ID, "iTime"), float(Time));
+		glUniform1i(glGetUniformLocation(Buffer_A.ID, "iFrame"), int(current_frame));
 		glUniform2f(glGetUniformLocation(Buffer_A.ID, "iResolution"), Width, Height);
 		last_frame_tex.Bind();
 
@@ -124,10 +124,10 @@ int main() {
 
 		Main_Image.Activate();
 
-		glUniform1f(glGetUniformLocation(Main_Image.ID, "iTime"), Time);
-		glUniform1i(glGetUniformLocation(Main_Image.ID, "iFrame"), current_frame);
+		glUniform1f(glGetUniformLocation(Main_Image.ID, "iTime"), float(Time));
+		glUniform1i(glGetUniformLocation(Main_Image.ID, "iFrame"), int(current_frame));
 		glUniform2f(glGetUniformLocation(Main_Image.ID, "iResolution"), Width, Height);
-		buffer_tex_a.Bind(GL_TEXTURE0);
+		buffer_tex_a.Bind();
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
