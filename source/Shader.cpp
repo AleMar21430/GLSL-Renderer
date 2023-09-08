@@ -14,54 +14,40 @@ string get_file_contents(const char* filename) {
 	throw(errno);
 }
 
+string getSubstringAfterDelimiter(const string& input, const string& delimiter) {
+	size_t delimiterPos = input.find(delimiter);
+
+	if (delimiterPos != string::npos) {
+		return input.substr(delimiterPos + delimiter.length());
+	}
+	else {
+		return input;
+	}
+}
+
+string insertLinesIfDelimiterFound(const string& input, const string& delimiter, const string& lineToInsert) {
+	string result;
+	size_t pos = 0;
+	size_t prevPos = 0;
+
+	while ((pos = input.find(delimiter, prevPos)) != string::npos) {
+		result += input.substr(prevPos, pos - prevPos);
+		result += lineToInsert;
+		prevPos = pos + delimiter.length();
+	}
+	result += input.substr(prevPos);
+	return result;
+}
+
 void Shader_Program::Init(const char* fragmentFile) {
 	Frag_Source = fragmentFile;
-
-	// Read vertexFile and fragmentFile and store the strings
-	string vertexCode = get_file_contents("./resources/Vert.glsl");
-	string fragmentCode = get_file_contents(fragmentFile);
-
-	// Convert the shader source strings into character arrays
-	const char* vertexSource = vertexCode.c_str();
-	const char* fragmentSource = fragmentCode.c_str();
-
-	// Create Vertex Shader Object and get its reference
-	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	// Attach Vertex Shader source to the Vertex Shader Object
-	glShaderSource(vertexShader, 1, &vertexSource, NULL);
-	// Compile the Vertex Shader into machine code
-	glCompileShader(vertexShader);
-	// Checks if Shader compiled succesfully
-	compileErrors(vertexShader, ("VERTEX " + Program_Name).c_str());
-
-	// Create Fragment Shader Object and get its reference
-	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	// Attach Fragment Shader source to the Fragment Shader Object
-	glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
-	// Compile the Vertex Shader into machine code
-	glCompileShader(fragmentShader);
-	// Checks if Shader compiled succesfully
-	compileErrors(fragmentShader, ("FRAGMENT " + Program_Name).c_str());
-
-	// Create Shader Program Object and get its reference
-	ID = glCreateProgram();
-	// Attach the Vertex and Fragment Shaders to the Shader Program
-	glAttachShader(ID, vertexShader);
-	glAttachShader(ID, fragmentShader);
-	// Wrap-up/Link all the shaders together into the Shader Program
-	glLinkProgram(ID);
-	// Checks if Shaders linked succesfully
-	compileErrors(ID, ("PROGRAM " + Program_Name).c_str());
-
-	// Delete the now useless Vertex and Fragment Shader objects
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
+	ReCompile();
 }
 
 void Shader_Program::ReCompile() {
 	glDeleteProgram(ID);
 
-	string vertexCode = get_file_contents("./resources/Vert.glsl");
+	string vertexCode = get_file_contents("./resources/Shaders/Vert.glsl");
 	string fragmentCode = get_file_contents(Frag_Source.c_str());
 
 	const char* vertexSource = vertexCode.c_str();

@@ -46,6 +46,12 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_R && action == GLFW_PRESS) {
 		Buffer_A.ReCompile();
 		Main_Image.ReCompile();
+
+		FBO_main.Bind();
+		buffer_tex_a.Resize(Width, Height);
+		FBO_main.Unbind();
+		last_frame_tex.Resize(Width, Height);
+
 		current_frame = 0;
 		iTime = glfwGetTime();
 	}
@@ -111,7 +117,7 @@ int main() {
 		VAO_main.Bind();
 
 		glUniform1f(glGetUniformLocation(Buffer_A.ID, "iTime"), float(Time));
-		glUniform1i(glGetUniformLocation(Buffer_A.ID, "iFrame"), int(current_frame));
+		glUniform1ui(glGetUniformLocation(Buffer_A.ID, "iFrame"), current_frame);
 		glUniform2f(glGetUniformLocation(Buffer_A.ID, "iResolution"), Width, Height);
 		last_frame_tex.Bind(GL_TEXTURE0);
 
@@ -125,7 +131,7 @@ int main() {
 		Main_Image.Activate();
 
 		glUniform1f(glGetUniformLocation(Main_Image.ID, "iTime"), float(Time));
-		glUniform1i(glGetUniformLocation(Main_Image.ID, "iFrame"), int(current_frame));
+		glUniform1ui(glGetUniformLocation(Main_Image.ID, "iFrame"), int(current_frame));
 		glUniform2f(glGetUniformLocation(Main_Image.ID, "iResolution"), Width, Height);
 		buffer_tex_a.Bind(GL_TEXTURE0);
 

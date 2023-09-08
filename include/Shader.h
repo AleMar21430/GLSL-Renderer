@@ -4,6 +4,10 @@
 
 string get_file_contents(const char* filename);
 
+
+string getSubstringAfterDelimiter(const string& input, const string& delimiter);
+string insertLinesIfDelimiterFound(const string& input, const string& delimiter, const string& lineToInsert);
+
 struct Shader_Program {
 	GLuint ID;
 	string Frag_Source, Program_Name;
