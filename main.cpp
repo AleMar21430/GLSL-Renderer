@@ -24,8 +24,8 @@ uint16_t Width = 860;
 uint16_t Height = 540;
 size_t current_frame = 0;
 double iTime = 0.0;
-FBT buffer_tex_a;
-FBT last_frame_tex;
+
+FBT buffer_tex_a, last_frame_tex;
 FBO FBO_main;
 Shader_Program Buffer_A("Buffer A");
 Shader_Program Main_Image("Main Image");
@@ -113,7 +113,7 @@ int main() {
 		glUniform1f(glGetUniformLocation(Buffer_A.ID, "iTime"), float(Time));
 		glUniform1i(glGetUniformLocation(Buffer_A.ID, "iFrame"), int(current_frame));
 		glUniform2f(glGetUniformLocation(Buffer_A.ID, "iResolution"), Width, Height);
-		last_frame_tex.Bind();
+		last_frame_tex.Bind(GL_TEXTURE0);
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
@@ -127,7 +127,7 @@ int main() {
 		glUniform1f(glGetUniformLocation(Main_Image.ID, "iTime"), float(Time));
 		glUniform1i(glGetUniformLocation(Main_Image.ID, "iFrame"), int(current_frame));
 		glUniform2f(glGetUniformLocation(Main_Image.ID, "iResolution"), Width, Height);
-		buffer_tex_a.Bind();
+		buffer_tex_a.Bind(GL_TEXTURE0);
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
@@ -140,7 +140,11 @@ int main() {
 	VAO_main.Delete();
 	VBO_main.Delete();
 	Faces.Delete();
+	FBO_main.Delete();
 	Buffer_A.Delete();
+	Main_Image.Delete();
+	buffer_tex_a.Delete();
+	last_frame_tex.Delete();
 	glfwDestroyWindow(window);
 	glfwTerminate();
 	return 0;
